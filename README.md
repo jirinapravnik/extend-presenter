@@ -1,4 +1,5 @@
 # Rozšířování presenterů
+[![Build Status](https://travis-ci.org/WebChemistry/ExtendPresenter.svg?branch=master)](https://travis-ci.org/WebChemistry/ExtendPresenter)
 
 registrace:
 ```yaml
