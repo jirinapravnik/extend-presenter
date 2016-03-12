@@ -68,7 +68,7 @@ class PresenterTest extends \Codeception\TestCase\Test {
 			$this->fail('ExtraWithoutInterface must throws exception.');
 		} catch (\Exception $e) {
 			$this->assertInstanceOf('Nette\Application\InvalidPresenterException', $e);
-			$this->assertSame('Presenter \'Foo3Presenter\' must implements interface WebChemistry\Application\IExtendPresenter.', $e->getMessage());
+			$this->assertSame('Presenter \'Extra3Presenter\' must implements interface WebChemistry\Application\IExtendPresenter.', $e->getMessage());
 		}
 	}
 
