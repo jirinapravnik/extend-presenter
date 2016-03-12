@@ -19,4 +19,4 @@ install:
     - composer self-update
     - composer install
 
-script: php vendor/codeception/codeception/codecept run
+script: php vendor/bin/codecept run
