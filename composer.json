@@ -1,0 +1,14 @@
+{
+  "name": "webchemistry/extend-presenter",
+  "type": "library",
+  "require": {
+    "nette/application": "~2.3.0",
+    "nette/di": "~2.3.0"
+  },
+  "require-dev": {
+    "codeception/codeception": "^2.0"
+  },
+  "autoload": {
+    "classmap": ["src/"]
+  }
+}
