@@ -22,7 +22,7 @@ class FooExtendPresenter extends FooPresenter implements IExtendPresenter {
 }
 ```
 
-Nalezeno a vrátí FooExtendPresenter místo FooPresenter. Příme volání FooExtendPresnter způsobí vyhození vyjímky.
+Nalezeno a vrátí FooExtendPresenter místo FooPresenter. Příme volání FooExtendPresenter způsobí vyhození vyjímky.
 
 ```php
 class FooPresenter extends BasePresenter {
