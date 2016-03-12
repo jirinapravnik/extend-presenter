@@ -7,33 +7,34 @@ class PresenterTest extends \Codeception\TestCase\Test {
 	 */
 	protected $tester;
 
-	/** @var \WebChemistry\Application\PresenterFactoryCallback */
+	/** @var \WebChemistry\Application\PresenterFactory */
 	protected $presenterFactory;
 
 	protected function _before() {
 		$container = new ContainerMock();
-		$this->presenterFactory = new \WebChemistry\Application\PresenterFactoryCallback(
-			$container, FALSE, NULL, NULL, [
-				'Foo3Presenter' => 'Bar3Presenter'
-			]
-		);
+		$presenterFactory = new \WebChemistry\Application\PresenterFactory(new \Nette\Bridges\ApplicationDI\PresenterFactoryCallback(
+			$container, FALSE, NULL
+		), NULL, [
+			'Foo3Presenter' => 'Bar3Presenter',
+		]);
+		$this->presenterFactory = $presenterFactory;
 	}
 
 	protected function _after() {
 	}
 
 	public function testCreateNormal() {
-		$this->assertInstanceOf('Foo1Presenter', $this->presenterFactory->__invoke('Foo1Presenter'));
+		$this->assertInstanceOf('Foo1Presenter', $this->presenterFactory->createPresenter('Foo1'));
 	}
 
 	public function testCreateExtend() {
-		$this->assertInstanceOf('Foo2Presenter', $this->presenterFactory->__invoke('Foo2Presenter'));
-		$this->assertInstanceOf('Foo2ExtendPresenter', $this->presenterFactory->__invoke('Foo2Presenter'));
+		$this->assertInstanceOf('Foo2Presenter', $this->presenterFactory->createPresenter('Foo2'));
+		$this->assertInstanceOf('Foo2ExtendPresenter', $this->presenterFactory->createPresenter('Foo2'));
 	}
 
 	public function testCallExtendPresenter() {
 		try {
-			$this->presenterFactory->__invoke('Foo2ExtendPresenter');
+			$this->presenterFactory->createPresenter('Foo2Extend');
 			$this->fail('CallExtendPresenter: PresenterFactory not throws exception.');
 		} catch (\Exception $e) {
 			$this->assertInstanceOf('Nette\Application\InvalidPresenterException', $e);
@@ -43,28 +44,28 @@ class PresenterTest extends \Codeception\TestCase\Test {
 	}
 
 	public function testExtra() {
-		$presenter = $this->presenterFactory->__invoke('Foo3Presenter');
+		$presenter = $this->presenterFactory->createPresenter('Foo3');
 		$this->assertInstanceOf('Foo3Presenter', $presenter);
 		$this->assertInstanceOf('Bar3Presenter', $presenter);
 	}
 
 	public function testCustomMapping() {
-		$presenterFactory = new \WebChemistry\Application\PresenterFactoryCallback(
-			new ContainerMock(), FALSE, NULL, '*CustomPresenter'
-		);
-		$presenter = $presenterFactory->__invoke('Foo3Presenter');
+		$presenterFactory = new \WebChemistry\Application\PresenterFactory(new \Nette\Bridges\ApplicationDI\PresenterFactoryCallback(
+			new ContainerMock(), FALSE, NULL
+		), '*CustomPresenter');
+		$presenter = $presenterFactory->createPresenter('Foo3');
 		$this->assertInstanceOf('Foo3Presenter', $presenter);
 		$this->assertInstanceOf('Foo3CustomPresenter', $presenter);
 	}
 
 	public function testExtraWithoutInterface() {
-		$presenterFactory = new \WebChemistry\Application\PresenterFactoryCallback(
-			new ContainerMock(), FALSE, NULL, NULL, [
-				'Foo3Presenter' => 'Extra3Presenter'
-			]
-		);
+		$presenterFactory = new \WebChemistry\Application\PresenterFactory(new \Nette\Bridges\ApplicationDI\PresenterFactoryCallback(
+			new ContainerMock(), FALSE, NULL
+		), NULL, [
+			'Foo3Presenter' => 'Extra3Presenter',
+		]);
 		try {
-			$presenter = $presenterFactory->__invoke('Foo3Presenter');
+			$presenterFactory->createPresenter('Foo3');
 			$this->fail('ExtraWithoutInterface must throws exception.');
 		} catch (\Exception $e) {
 			$this->assertInstanceOf('Nette\Application\InvalidPresenterException', $e);

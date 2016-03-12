@@ -19,11 +19,10 @@ class ExtendPresenterExtension extends CompilerExtension {
 		$config = $this->validateConfig($this->defaults);
 
 		$def = $builder->getDefinition($builder->getByType('Nette\Application\IPresenterFactory'));
-		/** @var Statement $factory */
-		$factory = $def->getFactory()->arguments[0];
-		$factory->setEntity('WebChemistry\Application\PresenterFactoryCallback');
-		$factory->arguments[] = $config['mapping'];
-		$factory->arguments[] = $config['extra'];
+		$original = $def->getFactory();
+		$original->arguments[] = $config['mapping'];
+		$original->arguments[] = $config['extra'];
+		$def->setFactory('WebChemistry\Application\PresenterFactory', $original->arguments);
 	}
 
 }

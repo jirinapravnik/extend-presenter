@@ -2,24 +2,28 @@
 
 namespace WebChemistry\Application;
 
-use Nette;
+use Nette\Application\PresenterFactory as NettePresenterFactory;
 use Nette\Application\InvalidPresenterException;
-use Nette\Bridges\ApplicationDI\PresenterFactoryCallback as NettePresenterFactoryCallback;
+use WebChemistry\Application\IExtendPresenter;
 
-class PresenterFactoryCallback extends NettePresenterFactoryCallback {
+class PresenterFactory extends NettePresenterFactory {
 
 	const DEFAULT_MAPPING = '*ExtendPresenter';
 	const SCAN_FILTER = '~(.+)Presenter$~';
 
-	/** @var string */
-	private $mapping = self::DEFAULT_MAPPING;
-
 	/** @var array */
 	private $extra = [];
 
-	public function __construct(Nette\DI\Container $container, $invalidLinkMode, $touchToRefresh, $mapping = NULL,
-								array $extra = []) {
-		parent::__construct($container, $invalidLinkMode, $touchToRefresh);
+	/** @var string */
+	private $mapping = self::DEFAULT_MAPPING;
+
+	/**
+	 * @param callable $factory
+	 * @param string $mapping
+	 * @param array $extra
+	 */
+	public function __construct($factory, $mapping = NULL, array $extra = []) {
+		parent::__construct($factory);
 		$this->extra = $extra;
 		if ($mapping) {
 			$this->mapping = $mapping;
@@ -27,11 +31,13 @@ class PresenterFactoryCallback extends NettePresenterFactoryCallback {
 	}
 
 	/**
-	 * @param string $class
-	 * @return Nette\Application\IPresenter
+	 * @param string $name
+	 * @return string
 	 * @throws InvalidPresenterException
 	 */
-	public function __invoke($class) {
+	public function getPresenterClass(& $name) {
+		$class = parent::getPresenterClass($name);
+
 		if (isset($this->extra[$class])) {
 			$extendPresenter = $this->extra[$class];
 		} else if (preg_match(self::SCAN_FILTER, $class, $matches)) {
@@ -39,19 +45,20 @@ class PresenterFactoryCallback extends NettePresenterFactoryCallback {
 		}
 
 		if (isset($extendPresenter) && class_exists($extendPresenter)) {
-			$extend = parent::__invoke($extendPresenter);
-			if ($extend instanceof IExtendPresenter) {
-				return $extend;
+			$implements = class_implements($extendPresenter);
+			if (isset($implements['WebChemistry\Application\IExtendPresenter'])) {
+				return $extendPresenter;
 			} else if (isset($this->extra[$class])) {
 				throw new InvalidPresenterException("Presenter '$extendPresenter' must implements interface WebChemistry\\Application\\IExtendPresenter.");
 			}
 		}
 
-		if (($presenter = parent::__invoke($class)) instanceof IExtendPresenter) {
+		$implements = class_implements($class);
+		if (isset($implements['WebChemistry\Application\IExtendPresenter'])) {
 			throw new InvalidPresenterException("Cannot load presenter '$class', because extends other presenter.");
 		}
 
-		return $presenter;
+		return $class;
 	}
 
 }
