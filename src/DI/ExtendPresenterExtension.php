@@ -4,13 +4,13 @@ namespace WebChemistry\Application\DI;
 
 use Nette\DI\CompilerExtension;
 use Nette\DI\Statement;
-use WebChemistry\Application\PresenterFactoryCallback;
+use WebChemistry\Application\PresenterFactory;
 
 class ExtendPresenterExtension extends CompilerExtension {
 
 	/** @var array */
 	public $defaults = [
-		'mapping' => PresenterFactoryCallback::DEFAULT_MAPPING,
+		'mapping' => PresenterFactory::DEFAULT_MAPPING,
 		'extra' => []
 	];
 
